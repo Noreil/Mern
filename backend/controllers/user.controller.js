@@ -34,19 +34,15 @@ module.exports.deleteUser = (req, res) => {
         .catch(err => res.status(400).json({ message : err }))
     }
 
-// Gérer pour add plusieurs id au tableau (voir avec les likes sur ancien projet)
 
 module.exports.follow = (req, res) => {
-    // Add to the follower list
-    // UserModel.findOne({_id: req.params.id }, { following: req.body.idToFollow })
-    //     .then(() => res.status(201).json({ message: 'Add to follower list '}))
-    //     .catch(err => res.status(400).json({ message : err }))
-    
-    // Je veux que Indon like Aurélien donc :
-    // ID Indon add to followers Aurélien et 
-    // ID Aurélien add to followings Indon
     userModel.findOne({ _id: req.params.id })
         .then(user => {
+            // Verifie si l'id de idToFollow est valid (peut etre faire vérification sur l'id params ici aussi)
+            if (!ObjectID.isValid(req.body.idToFollow)) {
+                return res.status(400).send('ID unknow : ' + req.body.idToFollow)
+            }
+
             if(!user.following.includes(req.body.idToFollow)) {
                 userModel.updateOne({ _id: req.params.id },
                     {
@@ -56,7 +52,7 @@ module.exports.follow = (req, res) => {
                 .then(() => res.status(201).json({ message : 'Ajout dans following'}))
                 .catch(err => res.status(400).json({ message : err }))   
             }else {
-                res.status(401).send('Déja dans la liste de follow')
+                return res.status(401).send('Déja dans la liste de follow 1')
             }
             if(!user.followers.includes(req.params.id) && !user.following.includes(req.body.idToFollow)) {
                 userModel.updateOne({ _id: req.body.idToFollow },
@@ -64,24 +60,43 @@ module.exports.follow = (req, res) => {
                         $push: {followers: req.params.id}
                     }
                 )
-                .then(() => res.status(201).json({ message : 'Ajout dans following'}))
+                .then(() => res.status(201).json({ message : 'Ajout dans followers'}))
                 .catch(err => res.status(400).json({ message : err }))   
             }else {
-                res.status(401).send('Déja dans la liste de follow')
+                return res.status(401).send('Déja dans la liste de follow 2')
             }
         })
-
-
-
-
-    
-    // // Add to the following list
-    // UserModel.findOne({_id: req.body.idToFollow }, { followers: req.params.id })
-    //     // .then(() => res.status(201).json({ message : 'Add to following list'}))
-    //     .catch(err => res.status(400).json({ message : err }))
-
 }
 
 module.exports.unfollow = (req, res) => {
-    
+    userModel.findOne({ _id: req.params.id })
+        .then(user => {
+            // Verifie si l'id de idToFollow est valid (peut etre faire vérification sur l'id params ici aussi)
+            if (!ObjectID.isValid(req.body.idToUnfollow)) {
+                return res.status(400).send('ID unknow : ' + req.body.idToFollow)
+            }
+
+            if(user.following.includes(req.body.idToUnfollow)) {
+                userModel.updateOne({ _id: req.params.id },
+                    {
+                        $pull: {following: req.body.idToUnfollow}
+                    }
+                )
+                .then(() => res.status(201).json({ message : 'Unfollow'}))
+                .catch(err => res.status(400).json({ message : err }))   
+            }else {
+                return res.status(401).send('Utilisateur non trouvé 1')
+            }
+            // if(user.followers.includes(req.params.id)) {
+            userModel.updateOne({ _id: req.body.idToUnfollow },
+                {
+                    $pull: {followers: req.params.id}
+                }
+            )
+            .then(() => res.status(201).json({ message : 'Unfollow'}))
+            .catch(err => res.status(400).json({ message : err }))   
+            // }else {
+            //     return res.status(401).send('Utilisateur non trouvé 2')
+            // }
+        })
 }
