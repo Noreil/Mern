@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { isEmail } = require('validator')
 const bcrypt = require('bcrypt')
+const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema(
     {
@@ -17,7 +18,9 @@ const userSchema = new mongoose.Schema(
             required: true,
             validate: [isEmail],
             lowercase: true,
-            trim: true
+            trim: true,
+            unique: true,
+
         },
         password: {
             type: String,
@@ -48,6 +51,8 @@ const userSchema = new mongoose.Schema(
     }
 );
 
+
+
 // function before save into dbb
 userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt();
@@ -66,5 +71,7 @@ userSchema.statics.login = async function(email, password) {
     }
     throw Error('incorrect email')
 }
+
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('users', userSchema)
