@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadPicture } from '../actions/user.actions';
+import { uploadPicture } from '../../actions/user.actions';
 
 export default function UploadImg() {
   const [file, setFile] = useState();

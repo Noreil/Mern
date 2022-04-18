@@ -40,7 +40,7 @@ module.exports.follow = (req, res) => {
         .then(user => {
             // Verifie si l'id de idToFollow est valid (peut etre faire vérification sur l'id params ici aussi)
             if (!ObjectID.isValid(req.body.idToFollow)) {
-                return res.status(400).send('ID unknow : ' + req.body.idToFollow)
+                return res.status(400).send('ID unknoww : ' + req.body.idToFollow)
             }
 
             if(!user.following.includes(req.body.idToFollow)) {
@@ -60,7 +60,7 @@ module.exports.follow = (req, res) => {
                         $push: {followers: req.params.id}
                     }
                 )
-                .then(() => res.status(201).json({ message : 'Ajout dans followers'}))
+                // .then(() => res.status(201).json({ message : 'Ajout dans followers'}))
                 .catch(err => res.status(400).json({ message : err }))   
             }else {
                 return res.status(401).send('Déja dans la liste de follow 2')
@@ -73,28 +73,30 @@ module.exports.unfollow = (req, res) => {
         .then(user => {
             // Verifie si l'id de idToFollow est valid (peut etre faire vérification sur l'id params ici aussi)
             if (!ObjectID.isValid(req.body.idToUnfollow)) {
-                return res.status(400).send('ID unknow : ' + req.body.idToFollow)
+                return res.status(400).send('ID unknow : ' + req.body.idToUnFollow)
             }
 
             if(user.following.includes(req.body.idToUnfollow)) {
                 userModel.updateOne({ _id: req.params.id },
                     {
+                        // Personne que je suis
                         $pull: {following: req.body.idToUnfollow}
                     }
                 )
                 .then(() => res.status(201).json({ message : 'Unfollow'}))
-                .catch(err => res.status(400).json({ message : err }))   
+                .catch(err => res.status(400).json({ message : "Unfollow 1" + err }))   
             }else {
                 return res.status(401).send('Utilisateur non trouvé 1')
             }
             // if(user.followers.includes(req.params.id)) {
             userModel.updateOne({ _id: req.body.idToUnfollow },
                 {
+                    // Personne qui me suis
                     $pull: {followers: req.params.id}
                 }
             )
             .then(() => res.status(201).json({ message : 'Unfollow'}))
-            .catch(err => res.status(400).json({ message : err }))   
+            .catch(err => res.status(400).json({ message : "Unfollow 1" + err }))
             // }else {
             //     return res.status(401).send('Utilisateur non trouvé 2')
             // }

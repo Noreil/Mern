@@ -15,3 +15,12 @@ export const dateParser = (num) => {
 
   return date.toString();
 };
+
+export const isEmpty = (value) => {
+  return (
+    value === undefined ||
+    null ||
+    (typeof value === 'object' && Object.keys(value).lenght === 0) ||
+    (typeof value === 'string' && value.trim().lenght === 0)
+  );
+};
